@@ -1,0 +1,290 @@
+{
+  "case": "hosting-invoice-with-pdf",
+  "expect": "labelled, kind invoice",
+  "payload": {
+    "id": "19a0c0001",
+    "threadId": "t",
+    "labelIds": [
+      "INBOX",
+      "UNREAD"
+    ],
+    "subject": "Invoice INV-20431 for October",
+    "text": "Hello,\nYour invoice INV-20431 for 24.00 EUR is attached. Payment is due by 31 October 2026.\nThank you for your business.",
+    "from": {
+      "value": [
+        {
+          "address": "billing@cloudhost.example",
+          "name": "CloudHost Billing"
+        }
+      ],
+      "text": "CloudHost Billing <billing@cloudhost.example>"
+    },
+    "headers": {
+      "from": "From: CloudHost Billing <billing@cloudhost.example>",
+      "subject": "Subject: Invoice INV-20431 for October"
+    },
+    "attachments": [
+      {
+        "fileName": "INV-20431.pdf",
+        "mimeType": "application/pdf"
+      }
+    ]
+  },
+  "execution_id": 173,
+  "status": "success",
+  "seconds": 13.3,
+  "nodes_run": [
+    "Test Webhook",
+    "Unwrap Sample (test only)",
+    "Set Label Settings",
+    "Check Email And Build Prompt",
+    "Ask Ollama Is It An Invoice",
+    "Read The Verdict",
+    "Is It An Invoice?",
+    "Add Invoice Label"
+  ],
+  "node_outputs": {
+    "Test Webhook": [
+      [
+        {
+          "json": {
+            "headers": {
+              "accept-encoding": "identity",
+              "content-length": "604",
+              "host": "127.0.0.1:5678",
+              "user-agent": "Python-urllib/3.12",
+              "cookie": "",
+              "content-type": "application/json",
+              "connection": "close"
+            },
+            "params": {},
+            "query": {},
+            "body": {
+              "id": "19a0c0001",
+              "threadId": "t",
+              "labelIds": [
+                "INBOX",
+                "UNREAD"
+              ],
+              "subject": "Invoice INV-20431 for October",
+              "text": "Hello,\nYour invoice INV-20431 for 24.00 EUR is attached. Payment is due by 31 October 2026.\nThank you for your business.",
+              "from": {
+                "value": [
+                  {
+                    "address": "billing@cloudhost.example",
+                    "name": "CloudHost Billing"
+                  }
+                ],
+                "text": "CloudHost Billing <billing@cloudhost.example>"
+              },
+              "headers": {
+                "from": "From: CloudHost Billing <billing@cloudhost.example>",
+                "subject": "Subject: Invoice INV-20431 for October"
+              },
+              "attachments": [
+                {
+                  "fileName": "INV-20431.pdf",
+                  "mimeType": "application/pdf"
+                }
+              ]
+            },
+            "webhookUrl": "http://localhost:5678/webhook/free-test-invoice",
+            "executionMode": "production"
+          }
+        }
+      ]
+    ],
+    "Unwrap Sample (test only)": [
+      [
+        {
+          "json": {
+            "id": "19a0c0001",
+            "threadId": "t",
+            "labelIds": [
+              "INBOX",
+              "UNREAD"
+            ],
+            "subject": "Invoice INV-20431 for October",
+            "text": "Hello,\nYour invoice INV-20431 for 24.00 EUR is attached. Payment is due by 31 October 2026.\nThank you for your business.",
+            "from": {
+              "value": [
+                {
+                  "address": "billing@cloudhost.example",
+                  "name": "CloudHost Billing"
+                }
+              ],
+              "text": "CloudHost Billing <billing@cloudhost.example>"
+            },
+            "headers": {
+              "from": "From: CloudHost Billing <billing@cloudhost.example>",
+              "subject": "Subject: Invoice INV-20431 for October"
+            }
+          },
+          "binary_files": [
+            "INV-20431.pdf"
+          ]
+        }
+      ]
+    ],
+    "Set Label Settings": [
+      [
+        {
+          "json": {
+            "id": "19a0c0001",
+            "threadId": "t",
+            "labelIds": [
+              "INBOX",
+              "UNREAD"
+            ],
+            "subject": "Invoice INV-20431 for October",
+            "text": "Hello,\nYour invoice INV-20431 for 24.00 EUR is attached. Payment is due by 31 October 2026.\nThank you for your business.",
+            "from": {
+              "value": [
+                {
+                  "address": "billing@cloudhost.example",
+                  "name": "CloudHost Billing"
+                }
+              ],
+              "text": "CloudHost Billing <billing@cloudhost.example>"
+            },
+            "headers": {
+              "from": "From: CloudHost Billing <billing@cloudhost.example>",
+              "subject": "Subject: Invoice INV-20431 for October"
+            },
+            "ollama_url": "http://localhost:11434",
+            "ollama_model": "qwen2.5:3b",
+            "max_email_chars": 3000
+          },
+          "binary_files": [
+            "INV-20431.pdf"
+          ]
+        }
+      ]
+    ],
+    "Check Email And Build Prompt": [
+      [
+        {
+          "json": {
+            "message_id": "19a0c0001",
+            "from": "billing@cloudhost.example",
+            "subject": "Invoice INV-20431 for October",
+            "attachments": [
+              "INV-20431.pdf (application/pdf)"
+            ],
+            "ollama_request": {
+              "url": "http://localhost:11434/api/chat",
+              "body": {
+                "model": "qwen2.5:3b",
+                "stream": false,
+                "format": "json",
+                "options": {
+                  "temperature": 0
+                },
+                "messages": [
+                  {
+                    "role": "system",
+                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none."
+                  },
+                  {
+                    "role": "user",
+                    "content": "FROM: CloudHost Billing <billing@cloudhost.example>\nSUBJECT: Invoice INV-20431 for October\nATTACHMENTS: INV-20431.pdf (application/pdf)\n\nHello,\nYour invoice INV-20431 for 24.00 EUR is attached. Payment is due by 31 October 2026.\nThank you for your business."
+                  }
+                ]
+              }
+            }
+          },
+          "binary_files": [
+            "INV-20431.pdf"
+          ]
+        }
+      ]
+    ],
+    "Ask Ollama Is It An Invoice": [
+      [
+        {
+          "json": {
+            "model": "qwen2.5:3b",
+            "created_at": "2026-10-18T22:37:19.193338378Z",
+            "message": {
+              "role": "assistant",
+              "content": "{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"CloudHost Billing\", \"reason\": \"Payment is due by 31 October 2026.\"}"
+            },
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 11933488917,
+            "load_duration": 869444,
+            "prompt_eval_count": 248,
+            "prompt_eval_cached_count": 4,
+            "prompt_eval_duration": 6951450000,
+            "eval_count": 40,
+            "eval_duration": 4835170000
+          }
+        }
+      ]
+    ],
+    "Read The Verdict": [
+      [
+        {
+          "json": {
+            "is_invoice": true,
+            "kind": "invoice",
+            "vendor": "CloudHost Billing",
+            "reason": "Payment is due by 31 October 2026.",
+            "message_id": "19a0c0001",
+            "from": "billing@cloudhost.example",
+            "subject": "Invoice INV-20431 for October",
+            "attachments": [
+              "INV-20431.pdf (application/pdf)"
+            ]
+          },
+          "binary_files": [
+            "INV-20431.pdf"
+          ]
+        }
+      ]
+    ],
+    "Is It An Invoice?": [
+      [
+        {
+          "json": {
+            "is_invoice": true,
+            "kind": "invoice",
+            "vendor": "CloudHost Billing",
+            "reason": "Payment is due by 31 October 2026.",
+            "message_id": "19a0c0001",
+            "from": "billing@cloudhost.example",
+            "subject": "Invoice INV-20431 for October",
+            "attachments": [
+              "INV-20431.pdf (application/pdf)"
+            ]
+          },
+          "binary_files": [
+            "INV-20431.pdf"
+          ]
+        }
+      ],
+      []
+    ],
+    "Add Invoice Label": [
+      [
+        {
+          "json": {
+            "is_invoice": true,
+            "kind": "invoice",
+            "vendor": "CloudHost Billing",
+            "reason": "Payment is due by 31 October 2026.",
+            "message_id": "19a0c0001",
+            "from": "billing@cloudhost.example",
+            "subject": "Invoice INV-20431 for October",
+            "attachments": [
+              "INV-20431.pdf (application/pdf)"
+            ]
+          },
+          "binary_files": [
+            "INV-20431.pdf"
+          ]
+        }
+      ]
+    ]
+  }
+}

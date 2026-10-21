@@ -1,0 +1,252 @@
+{
+  "case": "shop-receipt",
+  "expect": "labelled, kind receipt",
+  "payload": {
+    "id": "19a0c0002",
+    "threadId": "t",
+    "labelIds": [
+      "INBOX",
+      "UNREAD"
+    ],
+    "subject": "Your order #5521 receipt",
+    "text": "Thanks for your order!\n2 x A4 notebooks  9.98\nShipping  3.50\nTotal paid  13.48 GBP (Visa ending 4242)",
+    "from": {
+      "value": [
+        {
+          "address": "orders@paperstore.example",
+          "name": "Paper Store"
+        }
+      ],
+      "text": "Paper Store <orders@paperstore.example>"
+    },
+    "headers": {
+      "from": "From: Paper Store <orders@paperstore.example>",
+      "subject": "Subject: Your order #5521 receipt"
+    }
+  },
+  "execution_id": 174,
+  "status": "success",
+  "seconds": 8.6,
+  "nodes_run": [
+    "Test Webhook",
+    "Unwrap Sample (test only)",
+    "Set Label Settings",
+    "Check Email And Build Prompt",
+    "Ask Ollama Is It An Invoice",
+    "Read The Verdict",
+    "Is It An Invoice?",
+    "Add Invoice Label"
+  ],
+  "node_outputs": {
+    "Test Webhook": [
+      [
+        {
+          "json": {
+            "headers": {
+              "accept-encoding": "identity",
+              "content-length": "479",
+              "host": "127.0.0.1:5678",
+              "user-agent": "Python-urllib/3.12",
+              "cookie": "",
+              "content-type": "application/json",
+              "connection": "close"
+            },
+            "params": {},
+            "query": {},
+            "body": {
+              "id": "19a0c0002",
+              "threadId": "t",
+              "labelIds": [
+                "INBOX",
+                "UNREAD"
+              ],
+              "subject": "Your order #5521 receipt",
+              "text": "Thanks for your order!\n2 x A4 notebooks  9.98\nShipping  3.50\nTotal paid  13.48 GBP (Visa ending 4242)",
+              "from": {
+                "value": [
+                  {
+                    "address": "orders@paperstore.example",
+                    "name": "Paper Store"
+                  }
+                ],
+                "text": "Paper Store <orders@paperstore.example>"
+              },
+              "headers": {
+                "from": "From: Paper Store <orders@paperstore.example>",
+                "subject": "Subject: Your order #5521 receipt"
+              }
+            },
+            "webhookUrl": "http://localhost:5678/webhook/free-test-invoice",
+            "executionMode": "production"
+          }
+        }
+      ]
+    ],
+    "Unwrap Sample (test only)": [
+      [
+        {
+          "json": {
+            "id": "19a0c0002",
+            "threadId": "t",
+            "labelIds": [
+              "INBOX",
+              "UNREAD"
+            ],
+            "subject": "Your order #5521 receipt",
+            "text": "Thanks for your order!\n2 x A4 notebooks  9.98\nShipping  3.50\nTotal paid  13.48 GBP (Visa ending 4242)",
+            "from": {
+              "value": [
+                {
+                  "address": "orders@paperstore.example",
+                  "name": "Paper Store"
+                }
+              ],
+              "text": "Paper Store <orders@paperstore.example>"
+            },
+            "headers": {
+              "from": "From: Paper Store <orders@paperstore.example>",
+              "subject": "Subject: Your order #5521 receipt"
+            }
+          }
+        }
+      ]
+    ],
+    "Set Label Settings": [
+      [
+        {
+          "json": {
+            "id": "19a0c0002",
+            "threadId": "t",
+            "labelIds": [
+              "INBOX",
+              "UNREAD"
+            ],
+            "subject": "Your order #5521 receipt",
+            "text": "Thanks for your order!\n2 x A4 notebooks  9.98\nShipping  3.50\nTotal paid  13.48 GBP (Visa ending 4242)",
+            "from": {
+              "value": [
+                {
+                  "address": "orders@paperstore.example",
+                  "name": "Paper Store"
+                }
+              ],
+              "text": "Paper Store <orders@paperstore.example>"
+            },
+            "headers": {
+              "from": "From: Paper Store <orders@paperstore.example>",
+              "subject": "Subject: Your order #5521 receipt"
+            },
+            "ollama_url": "http://localhost:11434",
+            "ollama_model": "qwen2.5:3b",
+            "max_email_chars": 3000
+          }
+        }
+      ]
+    ],
+    "Check Email And Build Prompt": [
+      [
+        {
+          "json": {
+            "message_id": "19a0c0002",
+            "from": "orders@paperstore.example",
+            "subject": "Your order #5521 receipt",
+            "attachments": [],
+            "ollama_request": {
+              "url": "http://localhost:11434/api/chat",
+              "body": {
+                "model": "qwen2.5:3b",
+                "stream": false,
+                "format": "json",
+                "options": {
+                  "temperature": 0
+                },
+                "messages": [
+                  {
+                    "role": "system",
+                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none."
+                  },
+                  {
+                    "role": "user",
+                    "content": "FROM: Paper Store <orders@paperstore.example>\nSUBJECT: Your order #5521 receipt\nATTACHMENTS: none\n\nThanks for your order!\n2 x A4 notebooks  9.98\nShipping  3.50\nTotal paid  13.48 GBP (Visa ending 4242)"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    ],
+    "Ask Ollama Is It An Invoice": [
+      [
+        {
+          "json": {
+            "model": "qwen2.5:3b",
+            "created_at": "2026-10-18T22:37:28.588631142Z",
+            "message": {
+              "role": "assistant",
+              "content": "{\"is_invoice\": true, \"kind\": \"receipt\", \"vendor\": \"Paper Store\", \"reason\": \"confirms a payment was made\"}"
+            },
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 7471787279,
+            "load_duration": 1088898,
+            "prompt_eval_count": 238,
+            "prompt_eval_cached_count": 161,
+            "prompt_eval_duration": 2542722000,
+            "eval_count": 31,
+            "eval_duration": 4894939000
+          }
+        }
+      ]
+    ],
+    "Read The Verdict": [
+      [
+        {
+          "json": {
+            "is_invoice": true,
+            "kind": "receipt",
+            "vendor": "Paper Store",
+            "reason": "confirms a payment was made",
+            "message_id": "19a0c0002",
+            "from": "orders@paperstore.example",
+            "subject": "Your order #5521 receipt",
+            "attachments": []
+          }
+        }
+      ]
+    ],
+    "Is It An Invoice?": [
+      [
+        {
+          "json": {
+            "is_invoice": true,
+            "kind": "receipt",
+            "vendor": "Paper Store",
+            "reason": "confirms a payment was made",
+            "message_id": "19a0c0002",
+            "from": "orders@paperstore.example",
+            "subject": "Your order #5521 receipt",
+            "attachments": []
+          }
+        }
+      ],
+      []
+    ],
+    "Add Invoice Label": [
+      [
+        {
+          "json": {
+            "is_invoice": true,
+            "kind": "receipt",
+            "vendor": "Paper Store",
+            "reason": "confirms a payment was made",
+            "message_id": "19a0c0002",
+            "from": "orders@paperstore.example",
+            "subject": "Your order #5521 receipt",
+            "attachments": []
+          }
+        }
+      ]
+    ]
+  }
+}

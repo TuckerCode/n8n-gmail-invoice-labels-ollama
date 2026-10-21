@@ -1,0 +1,320 @@
+{
+  "name": "Label invoice and receipt emails in Gmail with a local Ollama model",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "in:inbox -from:me"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "36040f44-7fbf-5c08-a4cc-b106bf48e334",
+      "name": "Watch Gmail Inbox",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4f940360-05fd-5ffc-8a7d-e9c9fe0e686b",
+              "name": "ollama_url",
+              "value": "http://localhost:11434",
+              "type": "string"
+            },
+            {
+              "id": "c63787c2-b82b-5bdf-a204-a1fb1252bee7",
+              "name": "ollama_model",
+              "value": "qwen2.5:3b",
+              "type": "string"
+            },
+            {
+              "id": "022f3b5c-7c2a-535f-91b8-f0192b26b43e",
+              "name": "max_email_chars",
+              "value": 3000,
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "19723ca7-396e-5487-86d5-2cfbd1bb8df5",
+      "name": "Set Label Settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// One new email per item, from the Gmail Trigger with Simplify off and Download Attachments on.\n// Only attachment file names are read here. The files themselves are passed along untouched.\nconst m = $input.item.json;\nconst sender = (m.from && m.from.value && m.from.value[0]) || {};\nconst fromAddress = String(sender.address || '').trim();\nconst fromName = String(sender.name || '').trim();\nconst subject = String(m.subject || '').trim();\nconst body = String(m.text || '').replace(/\\r/g, '').replace(/\\n{3,}/g, '\\n\\n').trim().slice(0, Number(m.max_email_chars) || 3000);\nconst attachments = Object.values($input.item.binary || {})\n  .map((b) => `${b.fileName || 'unnamed'} (${b.mimeType || 'unknown type'})`);\n\nconst system = [\n  'You sort incoming email for a small business.',\n  'Decide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.',\n  'Count these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,',\n  'subscription renewal charges, and reminders about an unpaid invoice.',\n  'Do not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,',\n  'password and login emails, and ordinary conversation.',\n  'Answer with JSON only, in this shape:',\n  '{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}',\n  'kind must be one of: invoice, receipt, bill, reminder, none.',\n].join('\\n');\n\nconst user = [\n  `FROM: ${fromName ? fromName + ' <' + fromAddress + '>' : fromAddress}`,\n  `SUBJECT: ${subject}`,\n  `ATTACHMENTS: ${attachments.length ? attachments.join(', ') : 'none'}`,\n  '',\n  body || '(no text body)',\n].join('\\n');\n\nreturn {\n  json: {\n    message_id: m.id || '',\n    from: fromAddress,\n    subject,\n    attachments,\n    ollama_request: {\n      url: String(m.ollama_url || 'http://localhost:11434').replace(/\\/+$/, '') + '/api/chat',\n      body: {\n        model: m.ollama_model || 'qwen2.5:3b',\n        stream: false,\n        format: 'json',\n        options: { temperature: 0 },\n        messages: [\n          { role: 'system', content: system },\n          { role: 'user', content: user },\n        ],\n      },\n    },\n  },\n  binary: $input.item.binary,\n};\n"
+      },
+      "id": "d1ed92b8-c06b-5804-8447-9131f38d5d0e",
+      "name": "Check Email And Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.ollama_request.url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.ollama_request.body) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "70ade883-0e96-59df-8876-5f662c54345a",
+      "name": "Ask Ollama Is It An Invoice",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Ollama's /api/chat answer is in message.content. With format: \"json\" it should be a JSON string,\n// but a small model sometimes wraps it in text, so take the first {...} block if a plain parse fails.\nfunction readModelJson(res) {\n  const raw = String((res && res.message && res.message.content) || res.response || '').trim();\n  if (!raw) return { ok: false, raw, data: {} };\n  try { return { ok: true, raw, data: JSON.parse(raw) }; } catch (e) {}\n  const m = raw.match(/\\{[\\s\\S]*\\}/);\n  if (m) { try { return { ok: true, raw, data: JSON.parse(m[0]) }; } catch (e) {} }\n  return { ok: false, raw, data: {} };\n}\n\nconst src = $('Check Email And Build Prompt').item;\nconst e = src.json;\nconst parsed = readModelJson($input.item.json);\nconst kinds = ['invoice', 'receipt', 'bill', 'reminder'];\nconst kind = String(parsed.data.kind || 'none').toLowerCase().trim();\n// Both fields must agree before a label goes on. A wrong label is worse than a missed one here.\nconst isInvoice = parsed.data.is_invoice === true && kinds.includes(kind);\n\nreturn {\n  json: {\n    is_invoice: isInvoice,\n    kind: isInvoice ? kind : 'none',\n    vendor: String(parsed.data.vendor || '').trim(),\n    reason: String(parsed.data.reason || (parsed.ok ? '' : 'the model answer could not be read')).trim(),\n    message_id: e.message_id,\n    from: e.from,\n    subject: e.subject,\n    attachments: e.attachments,\n  },\n  binary: src.binary,\n};\n"
+      },
+      "id": "787cf5d0-8b59-55b8-a759-069a471ad3c1",
+      "name": "Read The Verdict",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b26e6444-6d3b-57ed-a122-84ff05bed020",
+              "leftValue": "={{ $json.is_invoice }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2e352232-6dff-5e0e-996a-e61f4798637a",
+      "name": "Is It An Invoice?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.message_id }}",
+        "labelIds": []
+      },
+      "id": "c58254d4-6bc7-5c53-9418-76442ad4f852",
+      "name": "Add Invoice Label",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1340,
+        -100
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b5870fae-4d73-5d9b-aba1-fcb601830a8d",
+      "name": "Not An Invoice",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Label invoice and receipt emails in Gmail with a local Ollama model\n\nFor freelancers and small businesses whose invoices, receipts and bills get lost among other email. Every new inbox email is checked, and the ones that ask for or confirm a payment get a Gmail label you choose, such as Invoices. At month end, one click on that label shows everything for your bookkeeping.\n\nThe check runs on your own machine through Ollama, so there is no AI bill and no email text goes to an AI company.\n\n### How it works\n1. The Gmail Trigger checks for new inbox emails every minute and downloads their attachments.\n2. The sender, subject, attachment file names and the start of the body are sent to Ollama. The file contents are not read.\n3. The model answers whether this is an invoice, receipt, bill or payment reminder, and names the vendor.\n4. The label is added only when the model says yes and names one of those kinds. Quotes, newsletters and shipping updates are left alone.\n\n### Setup\n1. Install Ollama and pull a model, for example `ollama pull qwen2.5:3b`.\n2. In Gmail, create the label you want, for example Invoices.\n3. Connect a Gmail OAuth2 credential on **Watch Gmail Inbox** and **Add Invoice Label**.\n4. Open **Add Invoice Label** and pick your label in Label Names or IDs.\n5. If n8n runs in Docker, set ollama_url in **Set Label Settings** to `http://host.docker.internal:11434`.\n6. Activate the workflow.\n\n### Customization tips\nThe attachments travel with each labelled email, so you can add a node after Add Invoice Label to save the PDFs wherever you keep them.",
+        "height": 900,
+        "width": 520
+      },
+      "id": "0eb98886-95c7-5534-818b-ec23720b22bd",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        -340
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Watch the inbox\n\nNew inbox emails arrive with their attachments. Set Label Settings holds the model and its address.",
+        "height": 500,
+        "width": 420,
+        "color": 7
+      },
+      "id": "c816e3a2-3a66-5d8e-acf1-e2a413476836",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -340
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Ask the model\n\nSender, subject, attachment names and the start of the body go to Ollama, which answers invoice or not.",
+        "height": 500,
+        "width": 640,
+        "color": 7
+      },
+      "id": "27cb0044-7d14-5454-b54e-67314c39fdea",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        380,
+        -340
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Label it\n\nInvoices, receipts, bills and reminders get your label. Everything else is left as it was.",
+        "height": 600,
+        "width": 460,
+        "color": 7
+      },
+      "id": "e602286c-12e0-5db4-a72e-1c34d2bcffcb",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -340
+      ]
+    }
+  ],
+  "connections": {
+    "Watch Gmail Inbox": {
+      "main": [
+        [
+          {
+            "node": "Set Label Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Label Settings": {
+      "main": [
+        [
+          {
+            "node": "Check Email And Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Email And Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "Ask Ollama Is It An Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Ollama Is It An Invoice": {
+      "main": [
+        [
+          {
+            "node": "Read The Verdict",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read The Verdict": {
+      "main": [
+        [
+          {
+            "node": "Is It An Invoice?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is It An Invoice?": {
+      "main": [
+        [
+          {
+            "node": "Add Invoice Label",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not An Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

@@ -1,0 +1,290 @@
+{
+  "case": "quote-not-invoice",
+  "expect": "not labelled (a quote)",
+  "payload": {
+    "id": "19a0c0003",
+    "threadId": "t",
+    "labelIds": [
+      "INBOX",
+      "UNREAD"
+    ],
+    "subject": "Quote for 500 flyers",
+    "text": "Hi, as promised here is our quote: 500 A5 flyers, double sided, 85.00 plus VAT. This quote is valid for 30 days. Let me know if you want to go ahead.",
+    "from": {
+      "value": [
+        {
+          "address": "jo@printshop.example",
+          "name": "Jo at Print Shop"
+        }
+      ],
+      "text": "Jo at Print Shop <jo@printshop.example>"
+    },
+    "headers": {
+      "from": "From: Jo at Print Shop <jo@printshop.example>",
+      "subject": "Subject: Quote for 500 flyers"
+    },
+    "attachments": [
+      {
+        "fileName": "quote-500-flyers.pdf",
+        "mimeType": "application/pdf"
+      }
+    ]
+  },
+  "execution_id": 175,
+  "status": "success",
+  "seconds": 9.2,
+  "nodes_run": [
+    "Test Webhook",
+    "Unwrap Sample (test only)",
+    "Set Label Settings",
+    "Check Email And Build Prompt",
+    "Ask Ollama Is It An Invoice",
+    "Read The Verdict",
+    "Is It An Invoice?",
+    "Not An Invoice"
+  ],
+  "node_outputs": {
+    "Test Webhook": [
+      [
+        {
+          "json": {
+            "headers": {
+              "accept-encoding": "identity",
+              "content-length": "602",
+              "host": "127.0.0.1:5678",
+              "user-agent": "Python-urllib/3.12",
+              "cookie": "",
+              "content-type": "application/json",
+              "connection": "close"
+            },
+            "params": {},
+            "query": {},
+            "body": {
+              "id": "19a0c0003",
+              "threadId": "t",
+              "labelIds": [
+                "INBOX",
+                "UNREAD"
+              ],
+              "subject": "Quote for 500 flyers",
+              "text": "Hi, as promised here is our quote: 500 A5 flyers, double sided, 85.00 plus VAT. This quote is valid for 30 days. Let me know if you want to go ahead.",
+              "from": {
+                "value": [
+                  {
+                    "address": "jo@printshop.example",
+                    "name": "Jo at Print Shop"
+                  }
+                ],
+                "text": "Jo at Print Shop <jo@printshop.example>"
+              },
+              "headers": {
+                "from": "From: Jo at Print Shop <jo@printshop.example>",
+                "subject": "Subject: Quote for 500 flyers"
+              },
+              "attachments": [
+                {
+                  "fileName": "quote-500-flyers.pdf",
+                  "mimeType": "application/pdf"
+                }
+              ]
+            },
+            "webhookUrl": "http://localhost:5678/webhook/free-test-invoice",
+            "executionMode": "production"
+          }
+        }
+      ]
+    ],
+    "Unwrap Sample (test only)": [
+      [
+        {
+          "json": {
+            "id": "19a0c0003",
+            "threadId": "t",
+            "labelIds": [
+              "INBOX",
+              "UNREAD"
+            ],
+            "subject": "Quote for 500 flyers",
+            "text": "Hi, as promised here is our quote: 500 A5 flyers, double sided, 85.00 plus VAT. This quote is valid for 30 days. Let me know if you want to go ahead.",
+            "from": {
+              "value": [
+                {
+                  "address": "jo@printshop.example",
+                  "name": "Jo at Print Shop"
+                }
+              ],
+              "text": "Jo at Print Shop <jo@printshop.example>"
+            },
+            "headers": {
+              "from": "From: Jo at Print Shop <jo@printshop.example>",
+              "subject": "Subject: Quote for 500 flyers"
+            }
+          },
+          "binary_files": [
+            "quote-500-flyers.pdf"
+          ]
+        }
+      ]
+    ],
+    "Set Label Settings": [
+      [
+        {
+          "json": {
+            "id": "19a0c0003",
+            "threadId": "t",
+            "labelIds": [
+              "INBOX",
+              "UNREAD"
+            ],
+            "subject": "Quote for 500 flyers",
+            "text": "Hi, as promised here is our quote: 500 A5 flyers, double sided, 85.00 plus VAT. This quote is valid for 30 days. Let me know if you want to go ahead.",
+            "from": {
+              "value": [
+                {
+                  "address": "jo@printshop.example",
+                  "name": "Jo at Print Shop"
+                }
+              ],
+              "text": "Jo at Print Shop <jo@printshop.example>"
+            },
+            "headers": {
+              "from": "From: Jo at Print Shop <jo@printshop.example>",
+              "subject": "Subject: Quote for 500 flyers"
+            },
+            "ollama_url": "http://localhost:11434",
+            "ollama_model": "qwen2.5:3b",
+            "max_email_chars": 3000
+          },
+          "binary_files": [
+            "quote-500-flyers.pdf"
+          ]
+        }
+      ]
+    ],
+    "Check Email And Build Prompt": [
+      [
+        {
+          "json": {
+            "message_id": "19a0c0003",
+            "from": "jo@printshop.example",
+            "subject": "Quote for 500 flyers",
+            "attachments": [
+              "quote-500-flyers.pdf (application/pdf)"
+            ],
+            "ollama_request": {
+              "url": "http://localhost:11434/api/chat",
+              "body": {
+                "model": "qwen2.5:3b",
+                "stream": false,
+                "format": "json",
+                "options": {
+                  "temperature": 0
+                },
+                "messages": [
+                  {
+                    "role": "system",
+                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none."
+                  },
+                  {
+                    "role": "user",
+                    "content": "FROM: Jo at Print Shop <jo@printshop.example>\nSUBJECT: Quote for 500 flyers\nATTACHMENTS: quote-500-flyers.pdf (application/pdf)\n\nHi, as promised here is our quote: 500 A5 flyers, double sided, 85.00 plus VAT. This quote is valid for 30 days. Let me know if you want to go ahead."
+                  }
+                ]
+              }
+            }
+          },
+          "binary_files": [
+            "quote-500-flyers.pdf"
+          ]
+        }
+      ]
+    ],
+    "Ask Ollama Is It An Invoice": [
+      [
+        {
+          "json": {
+            "model": "qwen2.5:3b",
+            "created_at": "2026-10-18T22:37:37.784994272Z",
+            "message": {
+              "role": "assistant",
+              "content": "{\"is_invoice\": false, \"kind\": \"none\", \"vendor\": \"Print Shop\", \"reason\": \"This is a quote and not an invoice, receipt, bill, reminder, or subscription renewal.\"}"
+            },
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 8303211072,
+            "load_duration": 1017912,
+            "prompt_eval_count": 253,
+            "prompt_eval_cached_count": 161,
+            "prompt_eval_duration": 3113540000,
+            "eval_count": 44,
+            "eval_duration": 5166737000
+          }
+        }
+      ]
+    ],
+    "Read The Verdict": [
+      [
+        {
+          "json": {
+            "is_invoice": false,
+            "kind": "none",
+            "vendor": "Print Shop",
+            "reason": "This is a quote and not an invoice, receipt, bill, reminder, or subscription renewal.",
+            "message_id": "19a0c0003",
+            "from": "jo@printshop.example",
+            "subject": "Quote for 500 flyers",
+            "attachments": [
+              "quote-500-flyers.pdf (application/pdf)"
+            ]
+          },
+          "binary_files": [
+            "quote-500-flyers.pdf"
+          ]
+        }
+      ]
+    ],
+    "Is It An Invoice?": [
+      [],
+      [
+        {
+          "json": {
+            "is_invoice": false,
+            "kind": "none",
+            "vendor": "Print Shop",
+            "reason": "This is a quote and not an invoice, receipt, bill, reminder, or subscription renewal.",
+            "message_id": "19a0c0003",
+            "from": "jo@printshop.example",
+            "subject": "Quote for 500 flyers",
+            "attachments": [
+              "quote-500-flyers.pdf (application/pdf)"
+            ]
+          },
+          "binary_files": [
+            "quote-500-flyers.pdf"
+          ]
+        }
+      ]
+    ],
+    "Not An Invoice": [
+      [
+        {
+          "json": {
+            "is_invoice": false,
+            "kind": "none",
+            "vendor": "Print Shop",
+            "reason": "This is a quote and not an invoice, receipt, bill, reminder, or subscription renewal.",
+            "message_id": "19a0c0003",
+            "from": "jo@printshop.example",
+            "subject": "Quote for 500 flyers",
+            "attachments": [
+              "quote-500-flyers.pdf (application/pdf)"
+            ]
+          },
+          "binary_files": [
+            "quote-500-flyers.pdf"
+          ]
+        }
+      ]
+    ]
+  }
+}
