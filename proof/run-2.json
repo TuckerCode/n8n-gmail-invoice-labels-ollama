@@ -24,9 +24,9 @@
       "subject": "Subject: Your order #5521 receipt"
     }
   },
-  "execution_id": 174,
+  "execution_id": 280,
   "status": "success",
-  "seconds": 8.6,
+  "seconds": 9.3,
   "nodes_run": [
     "Test Webhook",
     "Unwrap Sample (test only)",
@@ -137,7 +137,7 @@
               "subject": "Subject: Your order #5521 receipt"
             },
             "ollama_url": "http://localhost:11434",
-            "ollama_model": "qwen2.5:3b",
+            "ollama_model": "qwen3:4b-instruct",
             "max_email_chars": 3000
           }
         }
@@ -154,7 +154,7 @@
             "ollama_request": {
               "url": "http://localhost:11434/api/chat",
               "body": {
-                "model": "qwen2.5:3b",
+                "model": "qwen3:4b-instruct",
                 "stream": false,
                 "format": "json",
                 "options": {
@@ -163,7 +163,7 @@
                 "messages": [
                   {
                     "role": "system",
-                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none."
+                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none.\nis_invoice is true for every kind you count, receipts and reminders included, and false only when kind is none."
                   },
                   {
                     "role": "user",
@@ -180,21 +180,21 @@
       [
         {
           "json": {
-            "model": "qwen2.5:3b",
-            "created_at": "2026-10-18T22:37:28.588631142Z",
+            "model": "qwen3:4b-instruct",
+            "created_at": "2026-10-22T01:53:19.610027583Z",
             "message": {
               "role": "assistant",
-              "content": "{\"is_invoice\": true, \"kind\": \"receipt\", \"vendor\": \"Paper Store\", \"reason\": \"confirms a payment was made\"}"
+              "content": "{\n  \"is_invoice\": true,\n  \"kind\": \"receipt\",\n  \"vendor\": \"Paper Store\",\n  \"reason\": \"The email confirms a payment was made and includes a total amount paid.\"\n}"
             },
             "done": true,
             "done_reason": "stop",
-            "total_duration": 7471787279,
-            "load_duration": 1088898,
-            "prompt_eval_count": 238,
-            "prompt_eval_cached_count": 161,
-            "prompt_eval_duration": 2542722000,
-            "eval_count": 31,
-            "eval_duration": 4894939000
+            "total_duration": 8943782885,
+            "load_duration": 1374245,
+            "prompt_eval_count": 261,
+            "prompt_eval_cached_count": 184,
+            "prompt_eval_duration": 2520054000,
+            "eval_count": 44,
+            "eval_duration": 6404961000
           }
         }
       ]
@@ -206,7 +206,7 @@
             "is_invoice": true,
             "kind": "receipt",
             "vendor": "Paper Store",
-            "reason": "confirms a payment was made",
+            "reason": "The email confirms a payment was made and includes a total amount paid.",
             "message_id": "19a0c0002",
             "from": "orders@paperstore.example",
             "subject": "Your order #5521 receipt",
@@ -222,7 +222,7 @@
             "is_invoice": true,
             "kind": "receipt",
             "vendor": "Paper Store",
-            "reason": "confirms a payment was made",
+            "reason": "The email confirms a payment was made and includes a total amount paid.",
             "message_id": "19a0c0002",
             "from": "orders@paperstore.example",
             "subject": "Your order #5521 receipt",
@@ -239,7 +239,7 @@
             "is_invoice": true,
             "kind": "receipt",
             "vendor": "Paper Store",
-            "reason": "confirms a payment was made",
+            "reason": "The email confirms a payment was made and includes a total amount paid.",
             "message_id": "19a0c0002",
             "from": "orders@paperstore.example",
             "subject": "Your order #5521 receipt",

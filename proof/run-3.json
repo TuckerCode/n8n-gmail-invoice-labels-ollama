@@ -30,9 +30,9 @@
       }
     ]
   },
-  "execution_id": 175,
+  "execution_id": 281,
   "status": "success",
-  "seconds": 9.2,
+  "seconds": 9.3,
   "nodes_run": [
     "Test Webhook",
     "Unwrap Sample (test only)",
@@ -152,7 +152,7 @@
               "subject": "Subject: Quote for 500 flyers"
             },
             "ollama_url": "http://localhost:11434",
-            "ollama_model": "qwen2.5:3b",
+            "ollama_model": "qwen3:4b-instruct",
             "max_email_chars": 3000
           },
           "binary_files": [
@@ -174,7 +174,7 @@
             "ollama_request": {
               "url": "http://localhost:11434/api/chat",
               "body": {
-                "model": "qwen2.5:3b",
+                "model": "qwen3:4b-instruct",
                 "stream": false,
                 "format": "json",
                 "options": {
@@ -183,7 +183,7 @@
                 "messages": [
                   {
                     "role": "system",
-                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none."
+                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none.\nis_invoice is true for every kind you count, receipts and reminders included, and false only when kind is none."
                   },
                   {
                     "role": "user",
@@ -203,21 +203,21 @@
       [
         {
           "json": {
-            "model": "qwen2.5:3b",
-            "created_at": "2026-10-18T22:37:37.784994272Z",
+            "model": "qwen3:4b-instruct",
+            "created_at": "2026-10-22T01:53:29.013034886Z",
             "message": {
               "role": "assistant",
-              "content": "{\"is_invoice\": false, \"kind\": \"none\", \"vendor\": \"Print Shop\", \"reason\": \"This is a quote and not an invoice, receipt, bill, reminder, or subscription renewal.\"}"
+              "content": "{\"is_invoice\": false, \"kind\": \"none\", \"vendor\": \"Print Shop\", \"reason\": \"This is a quote, not a request for payment or confirmation of payment.\"}"
             },
             "done": true,
             "done_reason": "stop",
-            "total_duration": 8303211072,
-            "load_duration": 1017912,
-            "prompt_eval_count": 253,
-            "prompt_eval_cached_count": 161,
-            "prompt_eval_duration": 3113540000,
-            "eval_count": 44,
-            "eval_duration": 5166737000
+            "total_duration": 8996679240,
+            "load_duration": 1216649,
+            "prompt_eval_count": 276,
+            "prompt_eval_cached_count": 184,
+            "prompt_eval_duration": 3068045000,
+            "eval_count": 40,
+            "eval_duration": 5910217000
           }
         }
       ]
@@ -229,7 +229,7 @@
             "is_invoice": false,
             "kind": "none",
             "vendor": "Print Shop",
-            "reason": "This is a quote and not an invoice, receipt, bill, reminder, or subscription renewal.",
+            "reason": "This is a quote, not a request for payment or confirmation of payment.",
             "message_id": "19a0c0003",
             "from": "jo@printshop.example",
             "subject": "Quote for 500 flyers",
@@ -251,7 +251,7 @@
             "is_invoice": false,
             "kind": "none",
             "vendor": "Print Shop",
-            "reason": "This is a quote and not an invoice, receipt, bill, reminder, or subscription renewal.",
+            "reason": "This is a quote, not a request for payment or confirmation of payment.",
             "message_id": "19a0c0003",
             "from": "jo@printshop.example",
             "subject": "Quote for 500 flyers",
@@ -272,7 +272,7 @@
             "is_invoice": false,
             "kind": "none",
             "vendor": "Print Shop",
-            "reason": "This is a quote and not an invoice, receipt, bill, reminder, or subscription renewal.",
+            "reason": "This is a quote, not a request for payment or confirmation of payment.",
             "message_id": "19a0c0003",
             "from": "jo@printshop.example",
             "subject": "Quote for 500 flyers",

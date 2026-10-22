@@ -30,9 +30,9 @@
       }
     ]
   },
-  "execution_id": 173,
+  "execution_id": 279,
   "status": "success",
-  "seconds": 13.3,
+  "seconds": 10.3,
   "nodes_run": [
     "Test Webhook",
     "Unwrap Sample (test only)",
@@ -152,7 +152,7 @@
               "subject": "Subject: Invoice INV-20431 for October"
             },
             "ollama_url": "http://localhost:11434",
-            "ollama_model": "qwen2.5:3b",
+            "ollama_model": "qwen3:4b-instruct",
             "max_email_chars": 3000
           },
           "binary_files": [
@@ -174,7 +174,7 @@
             "ollama_request": {
               "url": "http://localhost:11434/api/chat",
               "body": {
-                "model": "qwen2.5:3b",
+                "model": "qwen3:4b-instruct",
                 "stream": false,
                 "format": "json",
                 "options": {
@@ -183,7 +183,7 @@
                 "messages": [
                   {
                     "role": "system",
-                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none."
+                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none.\nis_invoice is true for every kind you count, receipts and reminders included, and false only when kind is none."
                   },
                   {
                     "role": "user",
@@ -203,21 +203,21 @@
       [
         {
           "json": {
-            "model": "qwen2.5:3b",
-            "created_at": "2026-10-18T22:37:19.193338378Z",
+            "model": "qwen3:4b-instruct",
+            "created_at": "2026-10-22T01:53:09.854093474Z",
             "message": {
               "role": "assistant",
-              "content": "{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"CloudHost Billing\", \"reason\": \"Payment is due by 31 October 2026.\"}"
+              "content": "{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"CloudHost Billing\", \"reason\": \"The email asks for payment and includes a specific invoice number and amount.\"}"
             },
             "done": true,
             "done_reason": "stop",
-            "total_duration": 11933488917,
-            "load_duration": 869444,
-            "prompt_eval_count": 248,
-            "prompt_eval_cached_count": 4,
-            "prompt_eval_duration": 6951450000,
+            "total_duration": 9549816342,
+            "load_duration": 1524723,
+            "prompt_eval_count": 271,
+            "prompt_eval_cached_count": 153,
+            "prompt_eval_duration": 3764621000,
             "eval_count": 40,
-            "eval_duration": 4835170000
+            "eval_duration": 5765498000
           }
         }
       ]
@@ -229,7 +229,7 @@
             "is_invoice": true,
             "kind": "invoice",
             "vendor": "CloudHost Billing",
-            "reason": "Payment is due by 31 October 2026.",
+            "reason": "The email asks for payment and includes a specific invoice number and amount.",
             "message_id": "19a0c0001",
             "from": "billing@cloudhost.example",
             "subject": "Invoice INV-20431 for October",
@@ -250,7 +250,7 @@
             "is_invoice": true,
             "kind": "invoice",
             "vendor": "CloudHost Billing",
-            "reason": "Payment is due by 31 October 2026.",
+            "reason": "The email asks for payment and includes a specific invoice number and amount.",
             "message_id": "19a0c0001",
             "from": "billing@cloudhost.example",
             "subject": "Invoice INV-20431 for October",
@@ -272,7 +272,7 @@
             "is_invoice": true,
             "kind": "invoice",
             "vendor": "CloudHost Billing",
-            "reason": "Payment is due by 31 October 2026.",
+            "reason": "The email asks for payment and includes a specific invoice number and amount.",
             "message_id": "19a0c0001",
             "from": "billing@cloudhost.example",
             "subject": "Invoice INV-20431 for October",

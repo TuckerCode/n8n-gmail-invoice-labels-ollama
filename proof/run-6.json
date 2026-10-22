@@ -24,9 +24,9 @@
       "subject": "Subject: Reminder: invoice 7781 is overdue"
     }
   },
-  "execution_id": 178,
+  "execution_id": 284,
   "status": "success",
-  "seconds": 7.2,
+  "seconds": 9.4,
   "nodes_run": [
     "Test Webhook",
     "Unwrap Sample (test only)",
@@ -137,7 +137,7 @@
               "subject": "Subject: Reminder: invoice 7781 is overdue"
             },
             "ollama_url": "http://localhost:11434",
-            "ollama_model": "qwen2.5:3b",
+            "ollama_model": "qwen3:4b-instruct",
             "max_email_chars": 3000
           }
         }
@@ -154,7 +154,7 @@
             "ollama_request": {
               "url": "http://localhost:11434/api/chat",
               "body": {
-                "model": "qwen2.5:3b",
+                "model": "qwen3:4b-instruct",
                 "stream": false,
                 "format": "json",
                 "options": {
@@ -163,7 +163,7 @@
                 "messages": [
                   {
                     "role": "system",
-                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none."
+                    "content": "You sort incoming email for a small business.\nDecide if this email is an invoice, a receipt, or a bill: a document that asks for payment or confirms a payment was made.\nCount these: invoices, receipts, order confirmations that show an amount paid, utility and phone bills,\nsubscription renewal charges, and reminders about an unpaid invoice.\nDo not count these: quotes and estimates, newsletters, marketing, shipping updates with no amount,\npassword and login emails, and ordinary conversation.\nAnswer with JSON only, in this shape:\n{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"who sent it\", \"reason\": \"one short sentence\"}\nkind must be one of: invoice, receipt, bill, reminder, none.\nis_invoice is true for every kind you count, receipts and reminders included, and false only when kind is none."
                   },
                   {
                     "role": "user",
@@ -180,21 +180,21 @@
       [
         {
           "json": {
-            "model": "qwen2.5:3b",
-            "created_at": "2026-10-18T22:37:55.964774762Z",
+            "model": "qwen3:4b-instruct",
+            "created_at": "2026-10-22T01:53:54.053319544Z",
             "message": {
               "role": "assistant",
-              "content": "{\"is_invoice\": true, \"kind\": \"invoice\", \"vendor\": \"Office Supply Co\", \"reason\": \"invoice for 156.40 GBP is overdue\"}"
+              "content": "{\n  \"is_invoice\": true,\n  \"kind\": \"reminder\",\n  \"vendor\": \"Office Supply Co\",\n  \"reason\": \"The email reminds the customer about an overdue invoice.\"\n}"
             },
             "done": true,
             "done_reason": "stop",
-            "total_duration": 6817238594,
-            "load_duration": 1378462,
-            "prompt_eval_count": 237,
-            "prompt_eval_cached_count": 161,
-            "prompt_eval_duration": 2266054000,
-            "eval_count": 38,
-            "eval_duration": 4521575000
+            "total_duration": 9099109369,
+            "load_duration": 1301856,
+            "prompt_eval_count": 260,
+            "prompt_eval_cached_count": 184,
+            "prompt_eval_duration": 2579441000,
+            "eval_count": 41,
+            "eval_duration": 6500398000
           }
         }
       ]
@@ -204,9 +204,9 @@
         {
           "json": {
             "is_invoice": true,
-            "kind": "invoice",
+            "kind": "reminder",
             "vendor": "Office Supply Co",
-            "reason": "invoice for 156.40 GBP is overdue",
+            "reason": "The email reminds the customer about an overdue invoice.",
             "message_id": "19a0c0006",
             "from": "accounts@officesupply.example",
             "subject": "Reminder: invoice 7781 is overdue",
@@ -220,9 +220,9 @@
         {
           "json": {
             "is_invoice": true,
-            "kind": "invoice",
+            "kind": "reminder",
             "vendor": "Office Supply Co",
-            "reason": "invoice for 156.40 GBP is overdue",
+            "reason": "The email reminds the customer about an overdue invoice.",
             "message_id": "19a0c0006",
             "from": "accounts@officesupply.example",
             "subject": "Reminder: invoice 7781 is overdue",
@@ -237,9 +237,9 @@
         {
           "json": {
             "is_invoice": true,
-            "kind": "invoice",
+            "kind": "reminder",
             "vendor": "Office Supply Co",
-            "reason": "invoice for 156.40 GBP is overdue",
+            "reason": "The email reminds the customer about an overdue invoice.",
             "message_id": "19a0c0006",
             "from": "accounts@officesupply.example",
             "subject": "Reminder: invoice 7781 is overdue",

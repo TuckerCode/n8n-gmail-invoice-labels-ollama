@@ -16,7 +16,7 @@ The check runs on your own machine through [Ollama](https://ollama.com), so ther
 
 ## Setup
 
-1. Install Ollama and pull a model: `ollama pull qwen2.5:3b`.
+1. Install Ollama and pull a model: `ollama pull qwen3:4b-instruct`.
 2. In Gmail, create the label you want, for example "Invoices".
 3. Import `workflow.json` into n8n.
 4. Connect a Gmail OAuth2 credential on **Watch Gmail Inbox** and **Add Invoice Label**.
@@ -34,7 +34,7 @@ The check runs on your own machine through [Ollama](https://ollama.com), so ther
 
 ## Tested
 
-Six sample emails were run through a test copy on n8n 2.35.7 with `qwen2.5:3b`. See [proof/README.md](proof/README.md).
+Six sample emails were run through a test copy on n8n 2.35.7 with `qwen3:4b-instruct`. See [proof/README.md](proof/README.md).
 
 Get more free templates by email: https://stats.sender.net/forms/dR630O/view
 
