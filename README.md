@@ -36,6 +36,6 @@ The check runs on your own machine through [Ollama](https://ollama.com), so ther
 
 Six sample emails were run through a test copy on n8n 2.35.7 with `qwen3:4b-instruct`. See [proof/README.md](proof/README.md).
 
-Get more free templates by email: https://stats.sender.net/forms/dR630O/view
+Get more free templates by email: https://www.airankings.tech/free?ref=gh
 
 Paid templates: https://airankings-templates.whop.site/?ref=gh-gmail-invoice-labels-ollama
